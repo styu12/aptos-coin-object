@@ -1,4 +1,4 @@
-/// This module defines simple example modules based on Coin Object
+/// This module defines example modules using Coin Object
 module coin_objects::mirny_coin {
     use std::string::{Self, String};
     use std::signer;
