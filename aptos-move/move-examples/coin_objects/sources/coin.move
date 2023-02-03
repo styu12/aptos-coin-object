@@ -8,13 +8,16 @@ module coin_objects::coin {
     // no coin resource exists
     const ENO_COINS:u64 = 1;
 
+    /// coins object : represents balances of coin object of buyer, seller, market
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct Coins<phantom T> has key, store {
         name: String,
         symbol: String,
         balance: u64
     }
-
+    
+     /// coin object : when execute withdraw or deposit, it reprensent amount of coin object to withdraw of deposit
+    /// when withdraw, deposit is done, the coin object will be deleted
     #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct Coin<phantom T> has key, store, drop, copy {
         name: String,
@@ -22,6 +25,7 @@ module coin_objects::coin {
         value: u64
     }
 
+    /// mint function for default address
     public fun mint<T>(
         creator: &signer,
         name: String,
@@ -44,6 +48,7 @@ module coin_objects::coin {
             // object::address_to_object_id(signer::address_of(&my_coins_object_signer))
     }
 
+     /// mint function for addresses which is not default address
     public fun mint_to<T>(
         creator: &signer,
         to: address,
@@ -63,6 +68,7 @@ module coin_objects::coin {
                 balance: amount
             };
 
+            // create coins object and transfer to creator
             move_to(&coins_object_signer, coins);
             object::transfer(
                 creator,
@@ -73,12 +79,14 @@ module coin_objects::coin {
             coins_object_id
     }
 
+     /// transfer coin object
     public entry fun transfer(account: &signer, from: address, to: address, amount: u64) {
         // event -> objectId
         let coin_object = coin::withdraw<MirnyCoin>(account, amount, from);
         coin::deposit<MirnyCoin>(to, coin_object);
     } 
 
+    /// withdraw from coins object
     public fun withdraw<T>(
         account: &signer, 
         amount: u64,
@@ -108,6 +116,7 @@ module coin_objects::coin {
     }
     
 
+    /// add coin object balance
     public fun deposit<T>(
         to: address, 
         coin_to_deposit: Coin<T>
@@ -117,6 +126,7 @@ module coin_objects::coin {
         dst_coins_object.balance = dst_coins_object.balance + coin_to_deposit.value;
     }
 
+    /// define coin object's property and set seller, buyer, market's balance
     fun initialize_coin<T>(
         creator: &signer,
         name: String,
@@ -139,6 +149,7 @@ module coin_objects::coin {
         coin_creator_ref
     }
 
+    /// create seed for coin object
     fun create_coin_id_seed(name: &String, symbol: &String): vector<u8> {
         let seed = *string::bytes(name);
         vector::append(&mut seed, b"::");
@@ -146,6 +157,7 @@ module coin_objects::coin {
         seed
     }
 
+     /// create seed for coins object
     public fun create_coins_id_seed(creator_address: &address, name: &String, symbol: &String): vector<u8> {
         let seed = bcs::to_bytes(creator_address);
         vector::append(&mut seed, b"::");
