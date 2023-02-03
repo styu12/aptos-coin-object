@@ -1,11 +1,9 @@
 module coin_objects::coin {
     use std::string::{Self, String};
-    // use std::option::{Self, Option};
     use std::vector;
     use std::signer;
     use std::bcs;
 
-    // use aptos_framework::optional_aggregator::{Self, OptionalAggregator};
     use aptos_framework::object::{Self, CreatorRef, ObjectId};
     // no coin resource exists
     const ENO_COINS:u64 = 1;

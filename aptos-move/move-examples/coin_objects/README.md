@@ -1,21 +1,43 @@
-# Coin Objects 
-create coin module based on 0x1::aptos_framework::object module
-https://github.com/aptos-labs/aptos-core/tree/main/aptos-move/move-examples/token_objects
+# Coin Objects
+## 🔥Shout out to David Wolinsky🔥 
+based on `0x1::aptos_framework::object module` made by David Wolinsky
+[his TokenObjects Module](https://github.com/aptos-labs/aptos-core/tree/main/aptos-move/move-examples/token_objects)
 
-## Run your local-testnet
-`cargo run -p aptos -- node run-local-testnet --with-faucet --faucet-port 8081 --force-restart --assume-yes`
+## Our Design - Module Coin
+### Coins 
+```
+Object {
+    Coins<T> {
+        Balance
+    }
+}
+```
+### Coin
+```
+Object {
+    Coin<T> {
+        Value
+    }
+}
+```
 
-## Create two aptos accounts
-Ex.
-`aptos init --profile default`
-`aptos init --profile seller`
+### Transfer 
+```
+ public entry fun transfer(account: &signer, from: address, to: address, amount: u64) {
+        // event -> objectId
+        let coin_object = coin::withdraw<MirnyCoin>(account, amount, from);
+        coin::deposit<MirnyCoin>(to, coin_object);
+    } 
+```
+- withdraw()
+1. Decrease the balance of Coins_Object of from account
+2. Create a new Coin_Object containing that amount of value
+- deposit()
+ 1. get Coin_Object which withdraw() returns
+ 2. Increase the balance of Coins_Object of to account
+  Finally, delete the Coin_Object of global storage. 
 
-## Check the address of seller profile
-set `SELLER` variable to `@{seller_address}`
-
-## Compile and Publish the coin module 
-`aptos move compile --named-addresses coin_objects=default`
-`aptos move publish --named-addresses coin_objects=default`
-
-## Run Transfer Method
-`aptos move run --function-id 'default::coin::test_transfer'`
+## What we are planning to create
+- `Swap` between `CoinObjects` and `TokenObjects`
+- `Bidding` system, which are available in dApps, especially NFT marketplaces
+- `Approve & Allowance` system of ERC20 in Aptos 
