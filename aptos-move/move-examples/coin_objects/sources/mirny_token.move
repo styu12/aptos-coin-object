@@ -1,3 +1,5 @@
+// This module defines examples of Token Object
+
 module coin_objects::mirny_token {
         use std::string;
         use std::option;
